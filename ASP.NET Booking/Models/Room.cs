@@ -1,6 +1,6 @@
 ﻿namespace ASP.NET_Booking.Models
 {
-    public class Rooms
+    public class Room
     {
         public int Id { get; set; }
         public int HotelId { get; set; }
