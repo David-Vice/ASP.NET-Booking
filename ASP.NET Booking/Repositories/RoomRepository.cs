@@ -24,19 +24,20 @@ namespace ASP.NET_Booking.Repositories
             throw new System.NotImplementedException();
         }
 
-        public async Task<IEnumerable<Room>> GetAll ()
+      
+        public Task<Room> Get(int id)
+        {
+            throw new System.NotImplementedException();
+            
+        }
+
+        public async Task<IEnumerable<Room>> GetAll()
         {
             using (IDbConnection db = connection)
             {
                 string query = @"SELECT * FROM Rooms";
                 return await db.QueryAsync<Room>(query);
             }
-        }
-
-        public Task<Room> Get(int id)
-        {
-            throw new System.NotImplementedException();
-            
         }
 
         public Task<int> Update(Room data)
