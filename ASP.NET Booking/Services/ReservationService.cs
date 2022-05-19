@@ -14,12 +14,12 @@ namespace ASP.NET_Booking.Services
         }
         public async Task<int> Add(Reservation reservation)
         {
-            throw new System.NotImplementedException();
+            return await _appData.Reservation.Add(reservation);
         }
 
-        public async Task<User> Get(int id)
+        public async Task<Reservation> Get(int id)
         {
-            return await _appData.Reservation.
+            return await _appData.Reservation.Get(id);
         }
     }
 }

@@ -6,7 +6,7 @@ namespace ASP.NET_Booking.Services.Interfaces
 {
     public interface IReservationService
     {
-        Task<User> Get(int id);
+        Task<Reservation> Get(int id);
         Task<int> Add(Reservation reservation);
     }
 }

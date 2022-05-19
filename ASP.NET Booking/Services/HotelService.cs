@@ -16,7 +16,7 @@ namespace ASP.NET_Booking.Services
         }
         public async Task<IEnumerable<Hotel>> GetHotels()
         {
-            return await _appData.Hotel.Get();
+            return await _appData.Hotel.GetAll();
         }
         //getavailable rooms by start and end date
         public async Task<IEnumerable<Room>> GetRoomsByDateAndHotelId(int HotelId,DateTime DateStart, DateTime DateEnd)

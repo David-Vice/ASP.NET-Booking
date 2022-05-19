@@ -27,11 +27,6 @@ namespace ASP.NET_Booking.Repositories
             throw new System.NotImplementedException();
         }
 
-        public Task<IEnumerable<Hotel>> Get()
-        {
-            throw new System.NotImplementedException();
-        }
-
         public Task<Hotel> Get(int id)
         {
             throw new System.NotImplementedException();
@@ -49,14 +44,23 @@ namespace ASP.NET_Booking.Repositories
                     LEFT JOIN Hotels ON Hotels.Id = Rooms.HotelId
                     WHERE Rooms.HotelId = @HotelId And Rooms.Id NOT IN (
                     SELECT Reservations.RoomId FROM Reservations
-                    WHERE (@startDate BETWEEN Reservations.DateStart AND Reservations.DateEnd) OR
-                    (@endDate BETWEEN Reservations.DateStart AND Reservations.DateEnd)
+                    WHERE NOT ((@startDate < Reservations.DateStart AND @endDate < Reservations.DateStart) OR
+                    (@startDate > Reservations.DateEnd AND @endDate > Reservations.DateEnd))
                     )";
                 DynamicParameters dynamicParameters = new DynamicParameters();
                 dynamicParameters.Add("@HotelId", HotelId);
                 dynamicParameters.Add("@startDate", startDate);
                 dynamicParameters.Add("@endDate", endDate);
                 return await db.QueryAsync<Room>(query,dynamicParameters);
+            }
+        }
+
+        public async Task<IEnumerable<Hotel>> GetAll()
+        {
+            using (IDbConnection db = connection)
+            {
+                string query = @"SELECT * FROM Hotels";
+                return await db.QueryAsync<Hotel>(query);
             }
         }
     }
