@@ -35,14 +35,26 @@ namespace ASP.NET_Booking.Repositories
             throw new System.NotImplementedException();
         }
 
-        public Task<IEnumerable<User>> Get()
+        public async Task<IEnumerable<User>> GetAll()
         {
-            throw new System.NotImplementedException();
+            using (IDbConnection db = connection)
+            {
+                string query = @"SELECT * FROM Users";
+                IEnumerable<User> users = await db.QueryFirstAsync<IEnumerable<User>>(query);
+                return users;
+            }
         }
 
-        public Task<User> Get(int id)
+        public async Task<User> Get(int id)
         {
-            throw new System.NotImplementedException();
+            using (IDbConnection db = connection)
+            {
+                string query = @"SELECT * FROM Users WHERE Users.Id = @Id";
+                DynamicParameters parameters = new DynamicParameters();
+                parameters.Add("Id", id);
+                User user = await db.QueryFirstAsync<User>(query, parameters);
+                return user;
+            }
         }
 
         public Task<int> Update(User data)
