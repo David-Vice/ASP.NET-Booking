@@ -26,11 +26,47 @@ namespace ASP.NET_Booking
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddDbContext<UserContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = Configuration.GetSection("Token").GetValue<bool>("CheckIssuer"),
+                    ValidIssuers = Configuration.GetSection("Token").GetValue<IEnumerable<string>>("Issuers"),
+                    ValidateAudience = Configuration.GetSection("Token").GetValue<bool>("CheckAudience"),
+                    ValidAudiences = Configuration.GetSection("Token").GetValue<IEnumerable<string>>("Audiences"),
+                    ValidateIssuerSigningKey = Configuration.GetSection("Token").GetValue<bool>("CheckSigningKey"),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetSection("Token").GetValue<string>("SuperSecretKey")))
+                };
+            });
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ASP.NET_Booking", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Please insert your token",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                      new OpenApiSecurityScheme
+                      {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        },
+                            Scheme = "oauth2",
+                            Name = "Bearer",
+                            In = ParameterLocation.Header,
+                      },
+                      new List<string>()
+                    }
+                });
             });
         }
 
@@ -48,6 +84,7 @@ namespace ASP.NET_Booking
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
