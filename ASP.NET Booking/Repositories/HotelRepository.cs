@@ -27,7 +27,7 @@ namespace ASP.NET_Booking.Repositories
             throw new System.NotImplementedException();
         }
 
-        public Task<IEnumerable<Hotel>> Get()
+        public Task<IEnumerable<Hotel>> GetAll()
         {
             throw new System.NotImplementedException();
         }

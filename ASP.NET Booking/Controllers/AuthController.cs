@@ -1,5 +1,6 @@
 ﻿using ASP.NET_Booking.Models;
 using ASP.NET_Booking.Repositories;
+using ASP.NET_Booking.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -21,10 +22,10 @@ namespace ASP.NET_Booking.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly DataContext _dataContext;
-        public AuthController(DataContext dataContext)
+        private readonly IAuthService _authService;
+        public AuthController(IAuthService authService)
         {
-            _dataContext = dataContext;
+            _authService = authService;
         }
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] User user)
@@ -33,26 +34,15 @@ namespace ASP.NET_Booking.Controllers
             {
                 return BadRequest(ModelState);
             }
-            User result = _dataContext. Users.FirstOrDefault<User>(u => u.Username == user.Username && u.Password == user.Password);
 
-            if (result == null)
+            string token = await _authService.Login(user);
+
+            if (token == null)
             {
                 return BadRequest("Username or Password is incorrect!");
             }
 
-            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("!My!T0k3n!S3cr3t!K3y"));
-            SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, user.Username),
-                new Claim(ClaimsIdentity.DefaultRoleClaimType, "Admin"),
-                new Claim("Welcome", "Hello, Vice!")
-            };
-
-            JwtSecurityToken token = new JwtSecurityToken(claims: claims, expires: DateTime.Now.AddDays(1), signingCredentials: credentials);
-
-            return Ok(new JwtSecurityTokenHandler().WriteToken(token));
+            return Ok(token);
         }
     }
 }

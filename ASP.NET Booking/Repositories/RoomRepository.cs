@@ -24,7 +24,7 @@ namespace ASP.NET_Booking.Repositories
             throw new System.NotImplementedException();
         }
 
-        public async Task<IEnumerable<Room>> Get()
+        public async Task<IEnumerable<Room>> GetAll ()
         {
             using (IDbConnection db = connection)
             {
