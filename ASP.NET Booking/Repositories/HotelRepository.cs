@@ -45,10 +45,18 @@ namespace ASP.NET_Booking.Repositories
         {
             using (IDbConnection db = connection)
             {
-                string query = @"SELECT * FROM Rooms";
-
-
-                return await db.QueryAsync<Room>(query);
+                string query = @"SELECT Rooms.* FROM Rooms
+                    LEFT JOIN Hotels ON Hotels.Id = Rooms.HotelId
+                    WHERE Rooms.HotelId = @HotelId And Rooms.Id NOT IN (
+                    SELECT Reservations.RoomId FROM Reservations
+                    WHERE (@startDate BETWEEN Reservations.DateStart AND Reservations.DateEnd) OR
+                    (@endDate BETWEEN Reservations.DateStart AND Reservations.DateEnd)
+                    )";
+                DynamicParameters dynamicParameters = new DynamicParameters();
+                dynamicParameters.Add("@HotelId", HotelId);
+                dynamicParameters.Add("@startDate", startDate);
+                dynamicParameters.Add("@endDate", endDate);
+                return await db.QueryAsync<Room>(query,dynamicParameters);
             }
         }
     }

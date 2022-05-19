@@ -9,14 +9,29 @@ namespace ASP.NET_Booking.Repositories
 {
     public class ReservationRepository : IRepository<Reservation>
     {
-        private readonly SqlConnection connection;
+        private readonly SqlConnection _connection;
         public ReservationRepository()
         {
-            connection = DataContext.GetConnection();
+            _connection = DataContext.GetConnection();
         }
-        public Task<int> Add(Reservation data)
+        public async Task<int> Add(Reservation data)
         {
-            throw new System.NotImplementedException();
+            using (IDbConnection db = _connection)
+            {
+                string query = @"INSERT INTO [dbo].Reservations (RoomId, UserId, DateStart, DateEnd)
+                VALUES (@RoomId, @UserId, @DateStart,  @DateEnd)"; 
+                
+                return await db.ExecuteAsync(query,
+                    new
+                    {
+                        data.RoomId,
+                        data.UserId,
+                        data.DateStart,
+                        data.DateEnd
+                    }
+                    );
+
+            }
         }
 
         public Task<int> Delete(int id)
@@ -31,9 +46,9 @@ namespace ASP.NET_Booking.Repositories
 
         public async Task<Reservation> Get(int id)
         {
-            using (IDbConnection db = connection)
+            using (IDbConnection db = _connection)
             {
-                string query = @"SELECT * FROM Book WHERE Id = @Id";
+                string query = @"SELECT * FROM Reservations WHERE Id = @Id";
                 DynamicParameters parameters = new DynamicParameters();
                 parameters.Add("Id", id);
                 Reservation reservation = await db.QueryFirstAsync<Reservation>(query, parameters);
