@@ -23,7 +23,6 @@ namespace ASP.NET_Booking.Controllers
             return await _hotelService.GetHotels();
         }
         [HttpGet("{id}")]
-        [Route("EmptyRooms")]
         public async Task<IEnumerable<Room>> GetEmptyRoomsByHotelId(int id,DateTime DateStart,DateTime DateEnd)
         {
             return await _hotelService.GetRoomsByDateAndHotelId(id,DateStart,DateEnd);

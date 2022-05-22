@@ -35,6 +35,8 @@ namespace ASP.NET_Booking
             services.AddScoped<IAppData, AppData>();
             services.AddTransient<IAuthService, AuthService>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IHotelService, HotelService>();
+            services.AddTransient<IReservationService, ReservationService>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
@@ -92,6 +94,12 @@ namespace ASP.NET_Booking
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(x => x
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .SetIsOriginAllowed(origin => true)
+               .AllowCredentials());
 
             app.UseAuthentication();
             app.UseAuthorization();
